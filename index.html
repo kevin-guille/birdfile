@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#f6f3ec">
+  <title>Bagues</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon-192.png">
+  <link rel="stylesheet" href="./app.css?v=8">
+</head>
+<body>
+  <header>
+    <strong>Bagues</strong>
+    <p id="msg" role="status"></p>
+  </header>
+  <main>
+    <section id="tab-bague">
+      <label for="bague">Numéro de bague</label>
+      <div class="stepper" id="stepper">
+        <button type="button" id="moins">-1</button>
+        <div class="bague-slot">
+          <input id="bague" size="4" inputmode="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done">
+        </div>
+        <button type="button" id="plus">+1</button>
+      </div>
+      <div class="sauts" id="sauts">
+        <button type="button" id="moins10">-10</button>
+        <button type="button" id="plus10">+10</button>
+        <button type="button" id="controle">Contrôle</button>
+      </div>
+      <p id="serie-info"></p>
+      <button type="button" id="ouvrir-code" class="code-btn">
+        <span id="code-affiche">Choisir le code</span>
+        <small id="nom-affiche"></small>
+      </button>
+      <p id="note"></p>
+      <div id="vues"></div>
+      <button type="button" id="libres" hidden>Photo quand même</button>
+      <p id="cri-etat"></p>
+      <button type="button" id="cri" class="primaire" hidden>Cri au relâché</button>
+      <button type="button" id="cri-libre" hidden>Cri quand même</button>
+      <audio id="cri-audio" controls hidden></audio>
+      <button type="button" id="suivante" class="primaire">Bague suivante</button>
+      <button type="button" id="effacer-une" hidden>Effacer cette bague</button>
+    </section>
+    <section id="tab-code" hidden>
+      <label for="recherche">Nom, code, Curruca, Iduna, iberiae</label>
+      <div class="clamp">
+        <input id="recherche" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search">
+      </div>
+      <div id="code-courant"></div>
+      <div id="resultats"></div>
+    </section>
+    <section id="tab-export" hidden>
+      <p id="bilan"></p>
+      <button type="button" id="zip" class="primaire">Télécharger le ZIP</button>
+      <div id="liste"></div>
+      <button type="button" id="effacer">Tout effacer</button>
+    </section>
+  </main>
+  <nav>
+    <button type="button" data-tab="bague" aria-selected="true">Bague</button>
+    <button type="button" data-tab="code">Code</button>
+    <button type="button" data-tab="export">Export</button>
+  </nav>
+  <section id="cam" hidden>
+    <div class="cam-top">
+      <button type="button" id="cam-fermer">Fermer</button>
+      <p id="cam-titre"></p>
+      <p id="cam-zoom">1x</p>
+    </div>
+    <div class="stage">
+      <video id="video" playsinline autoplay muted></video>
+      <div class="cadre"></div>
+    </div>
+    <p id="cam-hint"></p>
+    <p id="cam-bloque" hidden>Tourne le téléphone à l'horizontale.</p>
+    <button type="button" id="declencheur" aria-label="Photographier"></button>
+    <div id="apercu" hidden>
+      <img id="apercu-img" alt="Photo à confirmer">
+      <p id="apercu-info"></p>
+      <div class="row">
+        <button type="button" id="refaire">Refaire</button>
+        <button type="button" id="garder" class="primaire">Garder</button>
+      </div>
+    </div>
+  </section>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
