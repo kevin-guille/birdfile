@@ -2,13 +2,17 @@
 
 Fiche photo et son d'un oiseau en main, liée à son numéro de bague. Tout reste sur l'appareil, hors ligne.
 
+Ouvrir la page : https://kevin-guille.github.io/birdfile/
+
 ## Installer
 
-Avant le terrain, une seule fois, avec du réseau ou le câble. Ensuite l'icône marche sans le PC, y compris en mode avion.
+Chrome sur Android. Ouvre le lien ci-dessus, une seule fois, avec du réseau.
 
-Chrome Android. Menu Chrome, Ajouter à l'écran d'accueil. L'icône s'appelle Bagues. Ce geste n'est pas un bouton de la page : Chrome le range dans son menu.
+Menu Chrome, Ajouter à l'écran d'accueil. L'icône s'appelle Bagues. Chrome range ce geste dans son menu. Ensuite l'icône marche sans réseau, y compris en mode avion.
 
-Pour l'essai sur son propre téléphone, câble et débogage USB :
+La page du lien, `localhost` et `127.0.0.1` sont trois sites distincts. Les photos de l'un ne sont pas dans les autres.
+
+Pour un essai au câble sur son propre téléphone, débogage USB :
 
 ```
 python servir.py

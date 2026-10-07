@@ -2,6 +2,8 @@
 
 Dépôt public : birdfile. Le dossier local reste `bagues`. Le titre à l'écran reste Bagues.
 
+La page publique est https://kevin-guille.github.io/birdfile/ . Le README la montre en premier. L'installation passe par le menu Chrome, Ajouter à l'écran d'accueil.
+
 Les commits locaux sont signés Kevin Guille. Le push se fait depuis le compte kevin-guille.
 
 Les fichiers restent sans chemin personnel, sans nom d'utilisateur Windows, sans modèle de téléphone, sans lieu et sans coordonnées. L'auteur Kevin Guille reste visible.
