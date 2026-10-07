@@ -3,7 +3,8 @@
 
 La caméra du navigateur refuse une IP locale (http://192.168...). Le téléphone
 doit ouvrir 127.0.0.1, renvoyé vers ce PC par adb reverse. Une fois l'icône
-ajoutée à l'écran d'accueil, l'app reste hors ligne.
+ajoutée à l'écran d'accueil, l'app reste hors ligne. Éteindre le téléphone
+garde les fiches de cette adresse. Le chemin public est la page GitHub Pages.
 """
 
 import shutil
@@ -39,6 +40,7 @@ def main():
     print("Menu Chrome: Ajouter à l'écran d'accueil.")
     print("Puis mode avion, câble débranché, une photo test.")
     print("La photo doit être en 4:3, zoom 1, largeur idéalement au-dessus de 2400 px.")
+    print("Éteindre le téléphone garde les fiches de cette adresse.")
     print("Ctrl+C pour arrêter. L'icône reste utilisable sans ce script.")
     try:
         serveur.serve_forever()

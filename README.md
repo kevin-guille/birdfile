@@ -34,9 +34,13 @@ Sans espèce, les sept vues sont là : tête, dessus, croupion, aile droite, que
 
 La photo se prend à l'horizontale. Le cadre 4:3 occupe toute la hauteur. Le déclencheur est à droite. Le zoom doit être à 1.
 
+Le cliché gardé est le plus grand 4:3 proposé par l'appareil. Chrome montre un aperçu ramené à l'écran. Le JPEG n'est pas recompressé. La largeur s'écrit avant Garder, et dans `index.csv`. Sous 2400 px, la page le signale.
+
 Ajouter audio démarre le son. Si l'espèce demande un cri au relâché, le bouton le dit. Un son déjà gardé propose Refaire l'audio.
 
 Choisir une espèce n'écrit pas la fiche. Elle est écrite en gardant une photo, ou en arrêtant un audio.
+
+Éteindre le téléphone laisse les fiches en place. Une photo est écrite à Garder, un son à Stop. Sans ZIP, elles restent dans Chrome pour cette adresse. Tout effacer, Effacer cette bague, ou vider les données du site les enlève. Retirer l'icône ne les enlève pas.
 
 ## Export
 

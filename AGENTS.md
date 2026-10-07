@@ -18,7 +18,9 @@ Fiche : l'espèce est facultative. L'onglet Code ne sélectionne rien. Choisir u
 
 Libellés : Ajouter photos (seulement sans série de vues), Ajouter audio, Cri au relâché si le protocole le demande, Refaire l'audio si un son est déjà gardé. Pas de nom anglais. Le latin vient du champ `s`.
 
-Photo : paysage, cadre 4:3 sur toute la hauteur, déclencheur à droite. Sept vues nommées, une photo chacune. Pas de pile Autres.
+Photo : paysage, cadre 4:3 sur toute la hauteur, déclencheur à droite. Le fichier est le plus grand 4:3 proposé, zoom 1, JPEG d'origine. L'écran montre l'aperçu. Alerte sous 2400 px de large. Sept vues nommées, une photo chacune. Pas de pile Autres.
+
+Mémoire : IndexedDB `bagues` / `oiseaux` et le localStorage survivent à l'extinction, pour l'origine exacte. Rien n'est écrit avant Garder ou Stop. `storage.persist()` est demandé. Retirer l'icône n'efface pas. Tout effacer, Effacer cette bague, ou vider les données du site efface.
 
 Export : `index.csv` a les colonnes `bague;code;nom;latin;controle;vue;fichier;largeur;hauteur;zoom;prise;duree_s`. Un code vide efface nom et latin. Un zoom absent s'écrit `non lu`. Le ZIP réétiquette les fichiers avec l'espèce courante. La fiche garde `bague`, `code`, `nom`, `latin`, `controle`, `vues` (blob, w, h, zoom, ts) et `cri` (blob, mime, duree, ts).
 
