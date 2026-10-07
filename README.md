@@ -1,8 +1,22 @@
 # birdfile
 
-Fiche photo et son d'un oiseau en main, liée à son numéro de bague. Tout reste sur l'appareil, hors ligne.
+Dossier photo et son d'un oiseau en main, lié à son numéro de bague. Tout reste sur l'appareil, hors ligne.
 
 Ouvrir la page : https://kevin-guille.github.io/birdfile/
+
+## À quoi ça sert
+
+Le numéro de bague est le dossier. Les photos et le cri s'y rangent.
+
+Le code espèce est facultatif. Dans Code, un nom, un code ou le latin retrouve la liste monde, pour le bordereau. Sur la fiche, un appui attache l'espèce à cette bague.
+
+Ces fichiers servent ensuite à :
+
+- revoir le même oiseau dans le temps
+- décrire une mue, une variation, une sous-espèce possible
+- préparer une fiche d'oiseau en main pour s'entraîner
+
+La page garde les images. La comparaison se fait après.
 
 ## Installer
 

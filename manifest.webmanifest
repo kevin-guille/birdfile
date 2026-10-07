@@ -1,7 +1,7 @@
 {
   "name": "Bagues",
   "short_name": "Bagues",
-  "description": "Fiche photo et son d'un oiseau en main, liée à son numéro de bague.",
+  "description": "Dossier photo et son d'un oiseau en main, lié à son numéro de bague. Hors ligne.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

@@ -1,4 +1,4 @@
-const VERSION = "bagues-16";
+const VERSION = "bagues-17";
 const FICHIERS = [
   "./index.html",
   "./app.js",
