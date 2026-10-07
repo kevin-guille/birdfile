@@ -35,6 +35,7 @@ def main():
     serveur = ThreadingHTTPServer(("127.0.0.1", PORT), handler)
     print("")
     print("Sur le téléphone, Chrome ouvre: http://127.0.0.1:8080")
+    print("L'installation n'est pas un bouton de la page.")
     print("Menu Chrome: Ajouter à l'écran d'accueil.")
     print("Puis mode avion, câble débranché, une photo test.")
     print("La photo doit être en 4:3, zoom 1, largeur idéalement au-dessus de 2400 px.")

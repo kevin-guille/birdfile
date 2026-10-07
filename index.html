@@ -7,7 +7,7 @@
   <title>Bagues</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png">
-  <link rel="stylesheet" href="./app.css?v=10">
+  <link rel="stylesheet" href="./app.css?v=17">
 </head>
 <body>
   <header>
@@ -30,26 +30,29 @@
         <button type="button" id="controle">Contrôle</button>
       </div>
       <p id="serie-info"></p>
-      <button type="button" id="ouvrir-code" class="code-btn">
-        <span id="code-affiche">Choisir le code</span>
-        <small id="nom-affiche"></small>
-      </button>
+      <div id="espece-saisie">
+        <label for="espece-recherche">Espèce, facultative</label>
+        <div class="clamp">
+          <input id="espece-recherche" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search" placeholder="Nom, code ou latin">
+        </div>
+        <div id="espece-resultats"></div>
+      </div>
+      <p id="espece-ligne"></p>
+      <button type="button" id="retirer-espece" hidden>Retirer l'espèce</button>
       <p id="note"></p>
       <div id="vues"></div>
-      <button type="button" id="libres" hidden>Photo quand même</button>
+      <button type="button" id="libres" hidden>Ajouter photos</button>
       <p id="cri-etat"></p>
-      <button type="button" id="cri" class="primaire" hidden>Cri au relâché</button>
-      <button type="button" id="cri-libre" hidden>Cri quand même</button>
+      <button type="button" id="cri" class="primaire" hidden>Ajouter audio</button>
       <audio id="cri-audio" controls hidden></audio>
       <button type="button" id="suivante">Bague suivante</button>
       <button type="button" id="effacer-une" hidden>Effacer cette bague</button>
     </section>
     <section id="tab-code" hidden>
-      <label for="recherche">Nom, code, Curruca, Iduna, iberiae</label>
+      <label for="recherche">Recherche, sans lien avec la fiche</label>
       <div class="clamp">
         <input id="recherche" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search">
       </div>
-      <div id="code-courant"></div>
       <div id="resultats"></div>
     </section>
     <section id="tab-export" hidden>
@@ -60,7 +63,7 @@
     </section>
   </main>
   <nav>
-    <button type="button" data-tab="bague" aria-selected="true">Bague</button>
+    <button type="button" data-tab="bague" aria-selected="true">Fiche</button>
     <button type="button" data-tab="code">Code</button>
     <button type="button" data-tab="export">Export</button>
   </nav>
@@ -86,6 +89,16 @@
       </div>
     </div>
   </section>
+  <div id="danger" hidden role="alertdialog" aria-modal="true" aria-labelledby="danger-titre">
+    <div id="danger-slot">
+      <button type="button" id="danger-oui">Effacer</button>
+    </div>
+    <div id="danger-texte">
+      <p id="danger-titre"></p>
+      <p id="danger-detail"></p>
+    </div>
+    <button type="button" id="danger-non">Annuler</button>
+  </div>
   <script type="module" src="./app.js"></script>
 </body>
 </html>

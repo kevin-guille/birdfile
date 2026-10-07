@@ -1,34 +1,13 @@
 // Fonctions pures: codes, bague, JPEG, audio, ZIP. Pas de DOM.
 
 export const VUES = {
-  tete: {
-    label: "Tête",
-    hint: "Doigts hors de la tête. Sur un phragmite: raie sommitale et lores.",
-  },
-  dessus: {
-    label: "Dessus",
-    hint: "Manteau et bretelles. Doigts hors des stries.",
-  },
-  croupion: {
-    label: "Croupion",
-    hint: "Sus-caudales comprises. Doigts hors du cadre.",
-  },
-  aile: {
-    label: "Aile droite",
-    hint: "Aile droite, dessus, rémiges à plat. Ombre ouverte, pas de flash.",
-  },
-  queue: {
-    label: "Queue",
-    hint: "Queue étalée, vue de dessus.",
-  },
-  profil: {
-    label: "Profil",
-    hint: "Bec de côté. Projection primaire visible.",
-  },
-  face: {
-    label: "Face",
-    hint: "Gorge et face. Lumière égale, pas de flash.",
-  },
+  tete: { label: "Tête" },
+  dessus: { label: "Dessus" },
+  croupion: { label: "Croupion" },
+  aile: { label: "Aile droite" },
+  queue: { label: "Queue" },
+  profil: { label: "Profil" },
+  face: { label: "Face" },
 };
 
 const REQUIS = {
@@ -212,6 +191,12 @@ export function etatControle(serie, code) {
 export function etatRetourSerie(serie, codeSerie) {
   const bague = cleanBague(serie);
   return { mode: "serie", serie: bague, bague, code: codeSerie || "" };
+}
+
+// Une fiche déjà écrite impose son espèce, même vide. Sans fiche, l'espèce de la série reste.
+export function codeApresOuverture(codeSession, record) {
+  if (!record) return codeSession || "";
+  return record.code || "";
 }
 
 export function extensionCri(mime) {
@@ -761,8 +746,33 @@ function concatBytes(parts) {
   return out;
 }
 
+export function zoomArchive(zoom) {
+  return zoom == null ? "non lu" : zoom;
+}
+
+export function ligneArchive(oiseau, extra, libelle) {
+  const code = oiseau?.code || "";
+  const nom = code ? (libelle?.nom || oiseau?.nom || "") : "";
+  const latin = code ? (libelle?.latin || oiseau?.latin || "") : "";
+  return {
+    bague: oiseau?.bague || "",
+    code,
+    nom,
+    latin,
+    controle: oiseau?.controle ? "oui" : "",
+    vue: "",
+    fichier: "",
+    largeur: "",
+    hauteur: "",
+    zoom: "",
+    prise: "",
+    duree_s: "",
+    ...extra,
+  };
+}
+
 export function csvIndex(rows) {
-  const header = ["bague", "code", "nom", "controle", "vue", "fichier", "largeur", "hauteur", "zoom", "prise", "duree_s"];
+  const header = ["bague", "code", "nom", "latin", "controle", "vue", "fichier", "largeur", "hauteur", "zoom", "prise", "duree_s"];
   const lines = [header.join(";")];
   for (const row of rows) {
     lines.push(header.map((key) => csvField(row[key])).join(";"));

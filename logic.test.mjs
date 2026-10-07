@@ -8,11 +8,13 @@ import {
   criManquant,
   csvIndex,
   etiquette,
+  codeApresOuverture,
   etatApresSaisie,
   etatControle,
   etatRetourSerie,
   extensionCri,
   incrementBague,
+  ligneArchive,
   indexEspeces,
   lireEtiquetteAudio,
   lireEtiquetteJpeg,
@@ -24,11 +26,20 @@ import {
   tagJpeg,
   target43,
   vuesManquantes,
+  zoomArchive,
 } from "./logic.js";
 
 assert.equal(crc32(new TextEncoder().encode("123456789")), 0xcbf43926);
+const mini = indexEspeces([{ c: "PHYCOL", f: "Pouillot véloce", s: "Phylloscopus collybita" }]);
+assert.equal(searchEspeces(mini, "collybita", 5)[0].c, "PHYCOL");
+assert.equal(searchEspeces(mini, "Phylloscopus", 5)[0].c, "PHYCOL");
 assert.equal(cleanBague(" ga-12 3 "), "GA123");
+assert.equal(cleanBague("sx 12 3"), "SX123");
+assert.equal(cleanBague("12ab34"), "12AB34");
+assert.equal(cleanBague("GA50001B"), "GA50001B");
 assert.equal(incrementBague("GA000123", 1), "GA000124");
+assert.equal(incrementBague("12AB34", 1), "12AB35");
+assert.equal(incrementBague("GA50001B", 1), "GA50001B");
 assert.equal(incrementBague("GA41207", 10), "GA41217");
 assert.equal(incrementBague("GA41207", 20), "GA41227");
 assert.equal(incrementBague("GA000000", -1), "GA000000");
@@ -36,6 +47,11 @@ assert.equal(incrementBague("AB", 1), "AB");
 assert.deepEqual(etatControle("ga41227", "PHYCOL"), { mode: "controle", serie: "GA41227", bague: "", codeSerie: "PHYCOL" });
 assert.deepEqual(etatApresSaisie("controle", "GA41227", "v 44.55 66"), { mode: "controle", serie: "GA41227", bague: "V445566" });
 assert.deepEqual(etatRetourSerie("GA41227", "PHYCOL"), { mode: "serie", serie: "GA41227", bague: "GA41227", code: "PHYCOL" });
+assert.equal(codeApresOuverture("PHYCOL", null), "PHYCOL");
+assert.equal(codeApresOuverture("", null), "");
+assert.equal(codeApresOuverture("PHYCOL", { code: "ACRSCH" }), "ACRSCH");
+assert.equal(codeApresOuverture("PHYCOL", { code: "" }), "");
+assert.equal(codeApresOuverture("PHYCOL", {}), "");
 assert.equal(protocole("PHYCOL").cri, "requis");
 assert.equal(protocole("PHYCOLTRI").cri, "requis");
 assert.equal(protocole("PHYCOLIBE").cri, "requis");
@@ -179,23 +195,67 @@ assert.equal(photoAcceptable(3000, 4000).ok, false);
 assert.equal(photoAcceptable(1920, 1080).ok, false);
 assert.equal(photoAcceptable(1920, 1440).raison.includes("2400"), true);
 
-const csv = csvIndex([
-  {
-    bague: "GA1", code: "ACRSCH", nom: "Phragmite des joncs", controle: "", vue: "tete",
-    fichier: "GA1/tete.jpg", largeur: 4000, hauteur: 3000, zoom: 1, prise: "2026-11-08T07:00:00",
-  },
-  {
-    bague: "V445566", code: "PHYCOL", nom: "Pouillot véloce", controle: "oui", vue: "cri",
-    fichier: "V445566/cri.webm", duree_s: 4, prise: "2026-11-08T07:05:00",
-  },
-]);
-assert.equal(csv.includes("controle"), true);
+function lireZip(zip) {
+  const fichiers = [];
+  let curseur = 0;
+  while (curseur + 30 <= zip.length) {
+    const signature = (zip[curseur] | (zip[curseur + 1] << 8) | (zip[curseur + 2] << 16) | (zip[curseur + 3] << 24)) >>> 0;
+    if (signature !== 0x04034b50) break;
+    const methode = zip[curseur + 8] | (zip[curseur + 9] << 8);
+    const taille = (zip[curseur + 18] | (zip[curseur + 19] << 8) | (zip[curseur + 20] << 16) | (zip[curseur + 21] << 24)) >>> 0;
+    const nomLen = zip[curseur + 26] | (zip[curseur + 27] << 8);
+    const extra = zip[curseur + 28] | (zip[curseur + 29] << 8);
+    const debut = curseur + 30 + nomLen + extra;
+    const nom = new TextDecoder().decode(zip.slice(curseur + 30, curseur + 30 + nomLen));
+    assert.equal(methode, 0, nom);
+    fichiers.push({ name: nom, data: zip.slice(debut, debut + taille) });
+    curseur = debut + taille;
+  }
+  return fichiers;
+}
+
+const photoSansCode = ligneArchive(
+  { bague: "GA1", code: "", nom: "Pouillot véloce", latin: "Phylloscopus collybita", controle: false },
+  { vue: "tete", fichier: "GA1/tete.jpg", largeur: 4000, hauteur: 3000, zoom: 1, prise: "2026-11-08T07:00:00" },
+  { nom: "Pouillot véloce", latin: "Phylloscopus collybita" },
+);
+assert.equal(photoSansCode.nom, "");
+assert.equal(photoSansCode.latin, "");
+assert.equal(photoSansCode.largeur, 4000);
+assert.equal(photoSansCode.duree_s, "");
+assert.equal(zoomArchive(null), "non lu");
+assert.equal(zoomArchive(1), 1);
+assert.equal(zoomArchive(0), 0);
+const criCode = ligneArchive(
+  { bague: "V445566", code: "PHYCOL", nom: "ancien", latin: "", controle: true },
+  { vue: "cri", fichier: "V445566/cri.webm", duree_s: 4, prise: "2026-11-08T07:05:00" },
+  { nom: "Pouillot véloce", latin: "Phylloscopus collybita" },
+);
+assert.equal(criCode.nom, "Pouillot véloce");
+assert.equal(criCode.latin, "Phylloscopus collybita");
+assert.equal(criCode.controle, "oui");
+assert.equal(criCode.vue, "cri");
+assert.equal(criCode.duree_s, 4);
+assert.equal(criCode.zoom, "");
+const csv = csvIndex([photoSansCode, criCode, { nom: "a;b", bague: "GA2" }]);
+assert.equal(csv.split("\r\n")[0].replace(/^\uFEFF/, ""), "bague;code;nom;latin;controle;vue;fichier;largeur;hauteur;zoom;prise;duree_s");
 assert.equal(csv.includes("V445566/cri.webm"), true);
+assert.equal(csv.includes("Phylloscopus collybita"), true);
+assert.equal(csv.includes('"a;b"'), true);
+const lignesCsv = csv.replace(/^\uFEFF/, "").split("\r\n");
+assert.equal(lignesCsv[1].includes("Pouillot"), false);
+assert.equal(lignesCsv[2].includes("Pouillot véloce;Phylloscopus collybita"), true);
 const zip = buildZip([
   { name: "GA1/tete.jpg", data: tagged },
   { name: "index.csv", data: new TextEncoder().encode(csv) },
 ], new Date(2026, 10, 8, 7, 0, 0));
 assert.ok(zip.byteLength > 32);
+const extraits = lireZip(zip);
+assert.deepEqual(extraits.map((fichier) => fichier.name), ["GA1/tete.jpg", "index.csv"]);
+assert.equal(extraits[0].data.length, tagged.length);
+assert.equal(lireEtiquetteJpeg(extraits[0].data), "GA1 AILE_DROITE");
+assert.equal(new TextDecoder().decode(extraits[1].data).includes("GA1/tete.jpg"), true);
+assert.equal(new TextDecoder().decode(extraits[1].data).includes("V445566/cri.webm"), true);
 
 const traces = ["C:/" + "Users", "C:\\" + "Users", "ke" + "gui", "Pixel " + "8"];
 const textes = new Set([".js", ".mjs", ".css", ".html", ".md", ".py", ".webmanifest"]);

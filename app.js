@@ -1,6 +1,7 @@
 import {
   buildZip,
   cleanBague,
+  codeApresOuverture,
   criManquant,
   csvIndex,
   etatApresSaisie,
@@ -10,6 +11,7 @@ import {
   extensionCri,
   incrementBague,
   indexEspeces,
+  ligneArchive,
   marqueVue,
   noteCri,
   photoAcceptable,
@@ -20,6 +22,7 @@ import {
   target43,
   VUES,
   vuesManquantes,
+  zoomArchive,
 } from "./logic.js";
 
 const $ = (id) => document.getElementById(id);
@@ -27,14 +30,12 @@ const $ = (id) => document.getElementById(id);
 const state = {
   list: [],
   byCode: new Map(),
-  recents: [],
   bague: "",
   code: "",
   mode: "serie",
   serie: "",
   codeSerie: "",
   libres: false,
-  criLibre: false,
   criEtat: "repos",
   criDebut: 0,
   criUrl: "",
@@ -46,7 +47,6 @@ const state = {
   apercuUrl: "",
 };
 
-const RECENTS_KEY = "bagues-recents";
 const BAGUE_KEY = "bagues-bague";
 const CODE_KEY = "bagues-code";
 const MODE_KEY = "bagues-mode";
@@ -113,8 +113,107 @@ function vider(base) {
   });
 }
 
+function decompteFiches() {
+  const oiseaux = [...state.oiseaux.values()];
+  let photos = 0;
+  let audios = 0;
+  for (const oiseau of oiseaux) {
+    photos += Object.keys(oiseau.vues || {}).length;
+    if (oiseau.cri?.blob) audios += 1;
+  }
+  const morceaux = [`${oiseaux.length} ${oiseaux.length > 1 ? "bagues" : "bague"}`];
+  if (photos) morceaux.push(`${photos} ${photos > 1 ? "photos" : "photo"}`);
+  if (audios) morceaux.push(`${audios} ${audios > 1 ? "audios" : "audio"}`);
+  return morceaux.join(", ");
+}
+
+function calerDanger(panneau) {
+  const vv = window.visualViewport;
+  const sonde = document.createElement("div");
+  sonde.style.cssText = "position:fixed;top:0;left:0;width:0;height:0;margin:0;padding:0;pointer-events:none;";
+  document.body.appendChild(sonde);
+  const rect = sonde.getBoundingClientRect();
+  sonde.remove();
+  panneau.style.setProperty("--danger-haut", `${Math.max(0, -rect.top)}px`);
+  panneau.style.setProperty("--danger-gauche", `${Math.max(0, -rect.left)}px`);
+  panneau.style.setProperty("--danger-largeur", `${vv ? vv.width : window.innerWidth}px`);
+  panneau.style.setProperty("--danger-hauteur", `${vv ? vv.height : window.innerHeight}px`);
+}
+
+function lacherDanger(panneau) {
+  for (const nom of ["--danger-haut", "--danger-gauche", "--danger-largeur", "--danger-hauteur"]) {
+    panneau.style.removeProperty(nom);
+  }
+}
+
+function demanderEffacementTotal() {
+  const panneau = $("danger");
+  if (!panneau.hidden) return Promise.resolve(false);
+  const detail = decompteFiches();
+  const verbe = state.oiseaux.size > 1 || detail.includes(",") ? "vont quitter" : "va quitter";
+  return new Promise((resolve) => {
+    const oui = $("danger-oui");
+    const non = $("danger-non");
+    const vv = window.visualViewport;
+    const suivre = () => calerDanger(panneau);
+    let etape = 1;
+    const fermer = (ok) => {
+      panneau.hidden = true;
+      lacherDanger(panneau);
+      window.removeEventListener("scroll", suivre, true);
+      window.removeEventListener("resize", suivre);
+      if (vv) {
+        vv.removeEventListener("resize", suivre);
+        vv.removeEventListener("scroll", suivre);
+      }
+      oui.removeEventListener("click", surOui);
+      non.removeEventListener("click", surNon);
+      resolve(ok);
+    };
+    const montrer = () => {
+      if (etape === 1) {
+        $("danger-titre").textContent = "Effacer ces fiches ?";
+        $("danger-detail").textContent = `${detail} ${verbe} le téléphone.`;
+        oui.textContent = "Effacer";
+        panneau.dataset.place = "haut";
+      } else {
+        $("danger-titre").textContent = "Effacement définitif";
+        $("danger-detail").textContent = "Les photos et les audios partent du téléphone. Un ZIP déjà téléchargé reste.";
+        oui.textContent = "Effacer définitivement";
+        panneau.dataset.place = "bas";
+      }
+      panneau.hidden = false;
+      calerDanger(panneau);
+      panneau.scrollTop = 0;
+      non.focus({ preventScroll: true });
+    };
+    window.addEventListener("scroll", suivre, true);
+    window.addEventListener("resize", suivre);
+    if (vv) {
+      vv.addEventListener("resize", suivre);
+      vv.addEventListener("scroll", suivre);
+    }
+    const surOui = () => {
+      if (etape === 1) {
+        etape = 2;
+        montrer();
+        return;
+      }
+      fermer(true);
+    };
+    const surNon = () => fermer(false);
+    oui.addEventListener("click", surOui);
+    non.addEventListener("click", surNon);
+    montrer();
+  });
+}
+
 function nomDuCode(code) {
   return state.byCode.get(code)?.f || "";
+}
+
+function latinDuCode(code) {
+  return state.byCode.get(code)?.s || "";
 }
 
 function recordCourant() {
@@ -129,6 +228,7 @@ function assurerRecord() {
       bague: state.bague,
       code: state.code,
       nom: nomDuCode(state.code),
+      latin: latinDuCode(state.code),
       controle: state.mode === "controle",
       vues: {},
     };
@@ -136,6 +236,7 @@ function assurerRecord() {
   }
   record.code = state.code;
   record.nom = nomDuCode(state.code);
+  record.latin = latinDuCode(state.code);
   record.controle = state.mode === "controle";
   return record;
 }
@@ -150,9 +251,6 @@ function sauverSession() {
 
 function renderBague() {
   $("bague").value = state.bague;
-  const nom = nomDuCode(state.code);
-  $("code-affiche").textContent = state.code || "Choisir le code";
-  $("nom-affiche").textContent = nom;
   const proto = protocole(state.code);
   const rappel = [proto.note, noteCri(state.code)].filter(Boolean).join(" ");
   $("note").textContent = rappel;
@@ -176,12 +274,23 @@ function renderBague() {
   $("libres").hidden = !sansSerie;
   const aDuContenu = !!record && (Object.keys(record.vues || {}).length > 0 || !!record.cri);
   $("effacer-une").hidden = !aDuContenu;
+  $("retirer-espece").disabled = bloque;
+  renderEspeceFiche();
   renderCri(proto, record);
-  if (sansCode || sansSerie) {
+  if (!state.bague) {
     $("vues").innerHTML = "";
     return;
   }
-  const ids = proto.vues.length ? [...proto.vues, ...proto.optionnelles] : Object.keys(VUES);
+  const ids = !state.code || state.libres
+    ? Object.keys(VUES)
+    : [...proto.vues, ...proto.optionnelles];
+  for (const id of prises) {
+    if (VUES[id] && !ids.includes(id)) ids.push(id);
+  }
+  if (!ids.length) {
+    $("vues").innerHTML = "";
+    return;
+  }
   const vus = new Set();
   const ordre = ids.filter((id) => (vus.has(id) ? false : vus.add(id)));
   $("vues").innerHTML = ordre.map((id) => {
@@ -194,11 +303,35 @@ function renderBague() {
   }).join("");
 }
 
+function detailEspece(e) {
+  return `<b>${esc(e.c)}</b> ${esc(e.f || "")}<small class="latin">${esc(e.s || "")}</small>`;
+}
+
+function renderEspeceFiche() {
+  const espece = state.byCode.get(state.code);
+  const choisi = !!state.code;
+  $("espece-saisie").hidden = choisi;
+  $("espece-recherche").disabled = choisi;
+  if (choisi) {
+    $("espece-ligne").innerHTML = `<b>${esc(state.code)}</b><span class="nom-espece">${esc(nomDuCode(state.code))}</span><small class="latin">${esc(espece?.s || "")}</small>`;
+    $("retirer-espece").hidden = false;
+    $("espece-recherche").value = "";
+    $("espece-resultats").innerHTML = "";
+    return;
+  }
+  $("espece-ligne").textContent = "";
+  $("retirer-espece").hidden = true;
+  const q = $("espece-recherche").value;
+  const lignes = normalizeQuery(q) ? searchEspeces(state.list, q, 8) : [];
+  $("espece-resultats").innerHTML = lignes.map((e) => (
+    `<button type="button" class="resultat" data-espece="${esc(e.c)}">${detailEspece(e)}</button>`
+  )).join("");
+}
+
 function renderCri(proto, record) {
-  const veut = proto.cri === "requis" || proto.cri === "conseil" || state.criLibre || !!record?.cri;
-  $("cri").hidden = !state.bague || !veut;
-  $("cri-libre").hidden = !state.bague || !state.code || veut || proto.cri !== "non";
+  const demande = proto.cri === "requis" || proto.cri === "conseil";
   const audio = $("cri-audio");
+  $("cri").hidden = !state.bague;
   if (state.criEtat === "recording") {
     $("cri").textContent = "Stop";
     $("cri").classList.add("enregistrement");
@@ -208,7 +341,7 @@ function renderCri(proto, record) {
   }
   $("cri").classList.remove("enregistrement");
   if (record?.cri?.blob) {
-    $("cri").textContent = "Refaire le cri";
+    $("cri").textContent = "Refaire l'audio";
     if (state.criCle !== `${state.bague}:${record.cri.ts}`) {
       if (state.criUrl) URL.revokeObjectURL(state.criUrl);
       state.criUrl = URL.createObjectURL(record.cri.blob);
@@ -220,27 +353,15 @@ function renderCri(proto, record) {
     $("cri-etat").textContent = `${secondes} s gardées sur ${state.bague}.`;
     return;
   }
-  $("cri").textContent = "Cri au relâché";
+  $("cri").textContent = demande ? "Cri au relâché" : "Ajouter audio";
   audio.hidden = true;
   $("cri-etat").textContent = state.bague && proto.cri === "requis" ? "À prendre au relâché." : "";
 }
 
 function renderCode() {
   const q = $("recherche").value;
-  const courant = state.code
-    ? `<b>${esc(state.code)}</b><small>${esc(nomDuCode(state.code) || "copié")}</small>`
-    : "";
-  $("code-courant").innerHTML = courant;
-  let lignes = [];
-  if (!normalizeQuery(q)) {
-    const codes = [...new Set([...state.recents, "ACRSCI", "ACRBAE", "ACRSCH", "ACROLA", "HIPPAL", "HIPPALOPA", "PHYCOL", "MOTFLA"])];
-    lignes = codes.map((code) => state.byCode.get(code)).filter(Boolean);
-  } else {
-    lignes = searchEspeces(state.list, q, 40);
-  }
-  $("resultats").innerHTML = lignes.map((e) => (
-    `<button type="button" class="resultat" data-code="${esc(e.c)}"><b>${esc(e.c)}</b>${esc(e.f || e.s)}<br><small>${esc(e.s)}</small></button>`
-  )).join("");
+  const lignes = normalizeQuery(q) ? searchEspeces(state.list, q, 20) : [];
+  $("resultats").innerHTML = lignes.map((e) => `<p class="resultat">${detailEspece(e)}</p>`).join("");
 }
 
 function normalizeQuery(value) {
@@ -270,7 +391,10 @@ function renderExport() {
     incomplets ? `${incomplets} avec une vue requise manquante` : "",
     crisAbsents ? `${crisAbsents} sans le cri` : "",
   ].filter(Boolean).join(", ");
-  const morceauxBilan = [`${oiseaux.length} bagues`, `${photos} photos`];
+  const morceauxBilan = [
+    `${oiseaux.length} ${oiseaux.length > 1 ? "bagues" : "bague"}`,
+    `${photos} ${photos > 1 ? "photos" : "photo"}`,
+  ];
   if (cris === 1) morceauxBilan.push("1 cri");
   if (cris > 1) morceauxBilan.push(`${cris} cris`);
   morceauxBilan.push(`${mo} Mo`);
@@ -300,31 +424,22 @@ function onglet(nom) {
   if (nom === "bague") renderBague();
 }
 
-async function copier(code) {
-  try {
-    await navigator.clipboard.writeText(code);
-    dire(`${code} copié`);
-  } catch {
-    dire(code);
-  }
-}
-
 function choisirCode(code) {
-  state.code = code;
+  if (state.criEtat === "recording") return;
+  state.code = code || "";
   state.libres = false;
-  localStorage.setItem(CODE_KEY, code);
-  state.recents = [code, ...state.recents.filter((item) => item !== code)].slice(0, 12);
-  localStorage.setItem(RECENTS_KEY, JSON.stringify(state.recents));
+  localStorage.setItem(CODE_KEY, state.code);
   const existant = state.bague && state.oiseaux.get(state.bague);
   if (existant) {
     existant.code = state.code;
     existant.nom = nomDuCode(state.code);
+    existant.latin = latinDuCode(state.code);
     existant.controle = state.mode === "controle";
     if (state.base) ecrire(state.base, existant).catch(() => dire("Code pas enregistré."));
   }
-  copier(code);
+  $("espece-recherche").value = "";
+  sauverSession();
   renderBague();
-  renderCode();
 }
 
 function chargerBague(valeur) {
@@ -334,9 +449,8 @@ function chargerBague(valeur) {
   state.serie = etat.serie;
   state.bague = etat.bague;
   state.libres = false;
-  state.criLibre = false;
   const record = state.oiseaux.get(state.bague);
-  if (record?.code) state.code = record.code;
+  state.code = codeApresOuverture(state.code, record);
   sauverSession();
   renderBague();
 }
@@ -360,7 +474,6 @@ function ouvrirControle() {
   state.bague = "";
   state.code = "";
   state.libres = false;
-  state.criLibre = false;
   sauverSession();
   renderBague();
   dire("");
@@ -373,11 +486,9 @@ function retourSerie() {
   state.mode = etat.mode;
   state.serie = etat.serie;
   state.bague = etat.bague;
-  state.code = etat.code;
   state.libres = false;
-  state.criLibre = false;
   const record = state.oiseaux.get(state.bague);
-  if (record?.code) state.code = record.code;
+  state.code = codeApresOuverture(etat.code, record);
   sauverSession();
   renderBague();
   dire("");
@@ -407,6 +518,8 @@ async function verrouillerZoom(track) {
 }
 
 async function ouvrirCamera(vueId) {
+  const saisi = cleanBague($("bague").value);
+  if (saisi && saisi !== state.bague) chargerBague(saisi);
   if (!state.bague) {
     dire("Écris d'abord le numéro de bague.");
     return;
@@ -423,7 +536,7 @@ async function ouvrirCamera(vueId) {
   state.vueEnCours = vueId;
   const vue = VUES[vueId];
   $("cam-titre").textContent = `${state.bague}  ${vue.label}`;
-  $("cam-hint").textContent = vue.hint;
+  $("cam-hint").textContent = "";
   $("cam").hidden = false;
   $("apercu").hidden = true;
   $("declencheur").hidden = false;
@@ -547,15 +660,8 @@ async function garder() {
   renderBague();
 }
 
-function ligneIndex(oiseau, extra) {
-  return {
-    bague: oiseau.bague,
-    code: oiseau.code || "",
-    nom: oiseau.nom || nomDuCode(oiseau.code),
-    controle: oiseau.controle ? "oui" : "",
-    duree_s: "",
-    ...extra,
-  };
+function libelleArchive(oiseau) {
+  return { nom: nomDuCode(oiseau.code), latin: latinDuCode(oiseau.code) };
 }
 
 async function exporter() {
@@ -570,14 +676,14 @@ async function exporter() {
         name: chemin,
         data: tagJpeg(pixels, etiquette(oiseau.bague, oiseau.code, marqueVue(vue))),
       });
-      rows.push(ligneIndex(oiseau, {
+      rows.push(ligneArchive(oiseau, {
         vue,
         fichier: chemin,
-        largeur: photo.w,
-        hauteur: photo.h,
-        zoom: photo.zoom ?? "",
-        prise: photo.ts,
-      }));
+        largeur: photo.w ?? "",
+        hauteur: photo.h ?? "",
+        zoom: zoomArchive(photo.zoom),
+        prise: photo.ts || "",
+      }, libelleArchive(oiseau)));
     }
     if (oiseau.cri?.blob) {
       const ext = extensionCri(oiseau.cri.mime);
@@ -587,15 +693,15 @@ async function exporter() {
         name: chemin,
         data: tagAudio(son, oiseau.cri.mime, etiquette(oiseau.bague, oiseau.code)),
       });
-      rows.push(ligneIndex(oiseau, {
+      rows.push(ligneArchive(oiseau, {
         vue: "cri",
         fichier: chemin,
         largeur: "",
         hauteur: "",
         zoom: "",
-        prise: oiseau.cri.ts,
+        prise: oiseau.cri.ts || "",
         duree_s: Math.max(1, Math.round((oiseau.cri.duree || 0) / 1000)),
-      }));
+      }, libelleArchive(oiseau)));
     }
   }
   if (!files.length) {
@@ -645,11 +751,15 @@ function brancher() {
     else sauter(1);
   });
   $("cri").addEventListener("click", basculerCri);
-  $("cri-libre").addEventListener("click", () => {
-    state.criLibre = true;
-    renderBague();
+  $("espece-recherche").addEventListener("input", renderEspeceFiche);
+  $("espece-resultats").addEventListener("click", (event) => {
+    const bouton = event.target.closest("[data-espece]");
+    if (bouton) choisirCode(bouton.dataset.espece);
   });
-  $("ouvrir-code").addEventListener("click", () => onglet("code"));
+  $("retirer-espece").addEventListener("click", () => {
+    choisirCode("");
+    $("espece-recherche").focus();
+  });
   $("libres").addEventListener("click", () => {
     state.libres = true;
     renderBague();
@@ -667,25 +777,20 @@ function brancher() {
     if (bouton) ouvrirCamera(bouton.dataset.vue);
   });
   $("recherche").addEventListener("input", renderCode);
-  $("resultats").addEventListener("click", (event) => {
-    const bouton = event.target.closest("[data-code]");
-    if (bouton) choisirCode(bouton.dataset.code);
-  });
   $("liste").addEventListener("click", (event) => {
     const bouton = event.target.closest("[data-ouvrir]");
     if (!bouton) return;
     const bague = bouton.dataset.ouvrir;
     const record = state.oiseaux.get(bague);
     if (state.criEtat === "recording") return;
+    state.code = codeApresOuverture(state.code, record);
     if (record?.controle) {
       state.mode = "controle";
       state.bague = bague;
-      if (record.code) state.code = record.code;
     } else {
       state.mode = "serie";
       state.bague = bague;
       state.serie = bague;
-      if (record?.code) state.code = record.code;
     }
     sauverSession();
     onglet("bague");
@@ -693,11 +798,17 @@ function brancher() {
   $("zip").addEventListener("click", exporter);
   $("effacer").addEventListener("click", async () => {
     if (!state.oiseaux.size) return;
-    if (!confirm("Effacer toutes les photos de l'app ?")) return;
-    await vider(state.base);
+    if (!await demanderEffacementTotal()) return;
+    try {
+      await vider(state.base);
+    } catch {
+      dire("Effacement pas fait. Les fiches sont encore là.");
+      return;
+    }
     state.oiseaux.clear();
     renderExport();
-    dire("Photos effacées de l'app.");
+    renderBague();
+    dire("Fiches effacées du téléphone.");
   });
   $("cam-fermer").addEventListener("click", fermerCamera);
   $("declencheur").addEventListener("click", declencher);
@@ -705,8 +816,7 @@ function brancher() {
     state.attente = null;
     $("apercu").hidden = true;
     $("declencheur").hidden = false;
-    const vue = VUES[state.vueEnCours];
-    if (vue) $("cam-hint").textContent = vue.hint;
+    $("cam-hint").textContent = "";
     majOrientation();
   });
   $("garder").addEventListener("click", garder);
@@ -732,13 +842,7 @@ async function basculerCri() {
     return;
   }
   const saisi = cleanBague($("bague").value);
-  if (saisi && saisi !== state.bague) {
-    const etat = etatApresSaisie(state.mode, state.serie, saisi);
-    state.mode = etat.mode;
-    state.serie = etat.serie;
-    state.bague = etat.bague;
-    sauverSession();
-  }
+  if (saisi && saisi !== state.bague) chargerBague(saisi);
   if (!state.bague) {
     dire("Écris d'abord le numéro de bague.");
     return;
@@ -830,11 +934,6 @@ async function demarrer() {
   if (!window.isSecureContext) {
     dire("Ouvre l'app depuis http://127.0.0.1:8080, pas depuis un fichier.");
   }
-  try {
-    state.recents = JSON.parse(localStorage.getItem(RECENTS_KEY) || "[]");
-  } catch {
-    state.recents = [];
-  }
   state.bague = localStorage.getItem(BAGUE_KEY) || "";
   state.code = localStorage.getItem(CODE_KEY) || "";
   state.mode = localStorage.getItem(MODE_KEY) === "controle" ? "controle" : "serie";
@@ -855,6 +954,14 @@ async function demarrer() {
   try {
     state.base = await ouvrirBase();
     for (const oiseau of await lireTous(state.base)) state.oiseaux.set(oiseau.bague, oiseau);
+    const ouvert = state.oiseaux.get(state.bague);
+    if (ouvert) {
+      const code = codeApresOuverture(state.code, ouvert);
+      if (code !== state.code) {
+        state.code = code;
+        sauverSession();
+      }
+    }
   } catch {
     dire("Mémoire locale indisponible.");
   }
