@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readdirSync, readFileSync } from "node:fs";
+import { extname } from "node:path";
 import {
   buildZip,
   cleanBague,
@@ -194,4 +196,15 @@ const zip = buildZip([
   { name: "index.csv", data: new TextEncoder().encode(csv) },
 ], new Date(2026, 10, 8, 7, 0, 0));
 assert.ok(zip.byteLength > 32);
+
+const traces = ["C:/" + "Users", "C:\\" + "Users", "ke" + "gui", "Pixel " + "8"];
+const textes = new Set([".js", ".mjs", ".css", ".html", ".md", ".py", ".webmanifest"]);
+for (const nom of readdirSync(".")) {
+  if (nom === "especes.json" || !textes.has(extname(nom))) continue;
+  const texte = readFileSync(nom, "utf8");
+  for (const trace of traces) {
+    assert.equal(texte.includes(trace), false, `${nom} contient une trace interdite`);
+  }
+}
+
 console.log("ok");

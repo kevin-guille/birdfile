@@ -165,6 +165,7 @@ function renderBague() {
   $("sauts").classList.toggle("controle", controle);
   $("bague").placeholder = controle ? "Numéro étranger" : "";
   $("suivante").textContent = controle ? "Retour à la série" : "Bague suivante";
+  $("suivante").classList.toggle("primaire", controle || !!state.bague);
   $("serie-info").textContent = controle
     ? `Contrôle. La série reste ${state.serie || "vide"}.`
     : "";
@@ -275,7 +276,7 @@ function renderExport() {
   morceauxBilan.push(`${mo} Mo`);
   $("bilan").textContent = oiseaux.length
     ? `${morceauxBilan.join(", ")}.${alertes ? ` ${alertes}.` : ""}`
-    : "Aucune photo pour l'instant.";
+    : "Rien enregistré pour l'instant.";
   $("liste").innerHTML = oiseaux.map((oiseau) => {
     const faites = Object.keys(oiseau.vues || {});
     const manque = vuesManquantes(oiseau.code, faites);
@@ -480,7 +481,9 @@ async function declencher() {
     const zoom = await verrouillerZoom(state.cam.track);
     $("cam-zoom").textContent = zoom.zoom == null ? "zoom non lu" : `zoom ${zoom.zoom}`;
     if (!zoom.ok) {
-      dire("Le zoom n'est pas à 1. Photo non gardée.");
+      const raison = "Le zoom n'est pas à 1. Photo non gardée.";
+      $("cam-hint").textContent = raison;
+      dire(raison);
       return;
     }
     const caps = await state.cam.ic.getPhotoCapabilities();
@@ -495,6 +498,7 @@ async function declencher() {
     bitmap.close();
     const verdict = photoAcceptable(width, height);
     if (!verdict.ok) {
+      $("cam-hint").textContent = verdict.raison;
       dire(verdict.raison);
       return;
     }
@@ -519,7 +523,9 @@ async function declencher() {
     $("declencheur").hidden = true;
     if (verdict.raison) dire(verdict.raison);
   } catch (error) {
-    dire(error?.message || "La photo a échoué.");
+    const raison = error?.message || "La photo a échoué.";
+    $("cam-hint").textContent = raison;
+    dire(raison);
   } finally {
     majOrientation();
   }
@@ -699,6 +705,8 @@ function brancher() {
     state.attente = null;
     $("apercu").hidden = true;
     $("declencheur").hidden = false;
+    const vue = VUES[state.vueEnCours];
+    if (vue) $("cam-hint").textContent = vue.hint;
     majOrientation();
   });
   $("garder").addEventListener("click", garder);
