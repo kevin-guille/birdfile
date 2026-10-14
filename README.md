@@ -1,14 +1,14 @@
-# birdfile
+# BirdFile
 
-Dossier photo et son d'un oiseau en main, lié à son numéro de bague. Tout reste sur l'appareil, hors ligne.
-
-Ouvrir la page : https://kevin-guille.github.io/birdfile/
+https://kevin-guille.github.io/birdfile/
 
 ## À quoi ça sert
 
-Le numéro de bague est le dossier. Les photos et le cri s'y rangent.
+BirdFile fait deux choses, sur le téléphone, hors ligne.
 
-Le code espèce est facultatif. Dans Code, un nom, un code ou le latin retrouve la liste monde, pour le bordereau. Sur la fiche, un appui attache l'espèce à cette bague.
+La recherche retrouve un code de baguage. On écrit un code, un nom français ou un nom latin. La page affiche le code, le nom français et le nom latin.
+
+La fiche concerne un oiseau en main. Le numéro de bague est le dossier. Les photos de détail et le cri s'y rangent. L'espèce est facultative. Dans Code, la recherche sert au bordereau et n'écrit rien. Sur la fiche, un appui attache l'espèce à cette bague. Chaque photo et chaque son est un fichier. L'export ZIP contient ces fichiers et `index.csv`. Chaque ligne relie le fichier au numéro de bague, au code, au nom français, au nom latin, à la vue, à la date et à l'heure de prise, à la largeur, à la hauteur et au zoom.
 
 Ces fichiers servent ensuite à :
 
@@ -18,11 +18,17 @@ Ces fichiers servent ensuite à :
 
 La page garde les images. La comparaison se fait après.
 
+![Fiche BirdFile. Numéro de bague, code, nom français, nom latin, et vues à photographier.](captures/fiche.png)
+
+![Recherche de code. Le code, le nom français et le nom latin, sans rien écrire sur la fiche.](captures/code.png)
+
+![Export. Les fiches enregistrées, puis le ZIP qui contient index.csv.](captures/export.png)
+
 ## Installer
 
 Chrome sur Android. Ouvre le lien ci-dessus, une seule fois, avec du réseau.
 
-Menu Chrome, Ajouter à l'écran d'accueil. L'icône s'appelle Bagues. Chrome range ce geste dans son menu. Ensuite l'icône marche sans réseau, y compris en mode avion.
+Menu Chrome, Ajouter à l'écran d'accueil. L'icône s'appelle BirdFile. Chrome range ce geste dans son menu. Ensuite l'icône marche sans réseau, y compris en mode avion.
 
 La page du lien, `localhost` et `127.0.0.1` sont trois sites distincts. Les photos de l'un ne sont pas dans les autres.
 
@@ -58,7 +64,7 @@ Choisir une espèce n'écrit pas la fiche. Elle est écrite en gardant une photo
 
 ## Export
 
-Télécharger le ZIP. Un dossier par bague, les JPEG, le son, et `index.csv`.
+Télécharger le ZIP. Le fichier s'appelle `birdfile_` suivi de la date et de l'heure. Un dossier par bague, les JPEG, le son, et `index.csv`.
 
 Colonnes, séparées par des points-virgules :
 

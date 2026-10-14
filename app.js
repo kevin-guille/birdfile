@@ -722,7 +722,7 @@ async function exporter() {
     String(maintenant.getMinutes()).padStart(2, "0"),
   ].join("");
   lien.href = URL.createObjectURL(blob);
-  lien.download = `bagues_${horodatage}.zip`;
+  lien.download = `birdfile_${horodatage}.zip`;
   lien.click();
   setTimeout(() => URL.revokeObjectURL(lien.href), 4000);
   dire("ZIP téléchargé. Copie-le hors du téléphone ce soir.");

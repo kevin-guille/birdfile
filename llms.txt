@@ -1,0 +1,19 @@
+# BirdFile
+
+> BirdFile cherche un code oiseau et affiche le nom français et le nom latin. BirdFile tient aussi la fiche d'un oiseau en main : photos des détails et cri, liés au numéro de bague. Chaque photo et chaque son est un fichier repris dans index.csv.
+
+BirdFile est un outil gratuit, en français, qui tourne dans Chrome et reste sur le téléphone, y compris hors ligne. Il ne remplace pas la fiche papier et n'enregistre pas le lieu.
+
+La recherche porte sur la liste monde des codes de baguage. On saisit un code, un nom français ou un nom latin. La page répond par le code, le nom français et le nom latin.
+
+La fiche part du numéro de bague. L'espèce est facultative. Les photos de détail sont tête, dessus, croupion, aile droite, queue, profil et face, une photo par vue. Selon l'espèce, un cri au relâché se range dans le même dossier. L'export est un ZIP nommé birdfile_ suivi de la date et de l'heure. Il contient un dossier par numéro de bague, les fichiers, et index.csv. Les colonnes sont bague, code, nom, latin, controle, vue, fichier, largeur, hauteur, zoom, prise, duree_s. La colonne prise est la date et l'heure. Une ligne égale un fichier.
+
+## Pages
+
+- [BirdFile](https://kevin-guille.github.io/birdfile/): l'outil, recherche de code et fiche d'oiseau en main.
+- [Description pour les agents](https://kevin-guille.github.io/birdfile/sites.txt): le même résumé, en texte brut.
+- [Code source](https://github.com/kevin-guille/birdfile): le dépôt, le README et les captures.
+
+## Optional
+
+- [Sitemap](https://kevin-guille.github.io/birdfile/sitemap.xml): la page à indexer.

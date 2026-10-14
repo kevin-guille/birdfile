@@ -1,6 +1,6 @@
 # Agents
 
-Dépôt public : birdfile. Le dossier local reste `bagues`. Le titre à l'écran reste Bagues.
+Dépôt public : birdfile. Le dossier local reste `bagues`. Le titre à l'écran est BirdFile. La base IndexedDB reste `bagues`. La description publique est dans `index.html`, `manifest.webmanifest`, `README.md`, `llms.txt` et `sites.txt`.
 
 La page publique est https://kevin-guille.github.io/birdfile/ . Le README la montre en premier. L'installation passe par le menu Chrome, Ajouter à l'écran d'accueil.
 

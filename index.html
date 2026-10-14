@@ -4,16 +4,70 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="theme-color" content="#f3efe6">
-  <title>Bagues</title>
+  <title>BirdFile</title>
+  <meta name="application-name" content="BirdFile">
+  <meta name="author" content="Kevin Guille">
+  <meta name="description" content="Recherche d'un code oiseau (nom français et nom latin) et fiche d'oiseau en main. Chaque photo de détail est liée au numéro de bague et à la date dans un CSV.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://kevin-guille.github.io/birdfile/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:site_name" content="BirdFile">
+  <meta property="og:title" content="BirdFile">
+  <meta property="og:description" content="Recherche d'un code oiseau (nom français et nom latin) et fiche d'oiseau en main. Chaque photo de détail est liée au numéro de bague et à la date dans un CSV.">
+  <meta property="og:url" content="https://kevin-guille.github.io/birdfile/">
+  <meta property="og:image" content="https://kevin-guille.github.io/birdfile/icon-512.png">
+  <meta property="og:image:alt" content="Icône BirdFile, oiseau avec une bague">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="BirdFile">
+  <meta name="twitter:description" content="Recherche d'un code oiseau (nom français et nom latin) et fiche d'oiseau en main. Chaque photo de détail est liée au numéro de bague et à la date dans un CSV.">
+  <meta name="twitter:image" content="https://kevin-guille.github.io/birdfile/icon-512.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="BirdFile">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./icon-192.png">
-  <link rel="stylesheet" href="./app.css?v=17">
+  <link rel="icon" href="./icon-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="https://kevin-guille.github.io/birdfile/sitemap.xml">
+  <link rel="stylesheet" href="./app.css?v=18">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "BirdFile",
+    "url": "https://kevin-guille.github.io/birdfile/",
+    "image": "https://kevin-guille.github.io/birdfile/icon-512.png",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Android",
+    "browserRequirements": "Chrome",
+    "inLanguage": "fr",
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "EUR"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Kevin Guille",
+      "url": "https://github.com/kevin-guille"
+    },
+    "description": "BirdFile cherche un code oiseau et affiche le nom français et le nom latin. BirdFile tient aussi la fiche d'un oiseau en main : photos des détails et cri, liés au numéro de bague. Chaque photo et chaque son est un fichier. Le ZIP d'export contient ces fichiers et index.csv. Chaque ligne relie le fichier au numéro de bague, au code, au nom français, au nom latin, à la vue et à la date de prise. Tout reste sur le téléphone.",
+    "featureList": [
+      "Recherche d'un code oiseau, du nom français et du nom latin",
+      "Fiche d'oiseau en main, avec photos de détail liées au numéro de bague et à la date",
+      "Export ZIP et index.csv, une ligne par photo ou par son"
+    ]
+  }
+  </script>
 </head>
 <body>
   <header>
-    <strong>Bagues</strong>
+    <strong class="marque"><img src="./icon-512.png" alt="" width="32" height="32">BirdFile</strong>
     <p id="msg" role="status"></p>
   </header>
+  <noscript>
+    <p>BirdFile cherche un code oiseau et affiche le nom français et le nom latin. BirdFile tient aussi la fiche d'un oiseau en main. Les photos de détail et le cri sont liés au numéro de bague. Chaque fichier est une ligne de index.csv, avec le code, le nom français, le nom latin, la vue et la date de prise.</p>
+  </noscript>
   <main>
     <section id="tab-bague">
       <label for="bague">Numéro de bague</label>

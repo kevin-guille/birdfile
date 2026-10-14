@@ -38,8 +38,18 @@ header {
 }
 
 header strong {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 18px;
   font-weight: 700;
+}
+
+header strong img {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: block;
 }
 
 #msg {

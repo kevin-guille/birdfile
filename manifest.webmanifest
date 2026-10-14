@@ -1,14 +1,17 @@
 {
-  "name": "Bagues",
-  "short_name": "Bagues",
-  "description": "Dossier photo et son d'un oiseau en main, lié à son numéro de bague. Hors ligne.",
+  "name": "BirdFile",
+  "short_name": "BirdFile",
+  "description": "Recherche d'un code oiseau (nom français et nom latin) et fiche d'oiseau en main. Chaque photo de détail est liée au numéro de bague et à la date dans un CSV.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f3efe6",
   "theme_color": "#f3efe6",
+  "lang": "fr",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
