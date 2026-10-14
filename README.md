@@ -18,11 +18,9 @@ Ces fichiers servent ensuite à :
 
 La page garde les images. La comparaison se fait après.
 
-![Fiche BirdFile. Numéro de bague, code, nom français, nom latin, et vues à photographier.](captures/fiche.png)
-
-![Recherche de code. Le code, le nom français et le nom latin, sans rien écrire sur la fiche.](captures/code.png)
-
-![Export. Les fiches enregistrées, puis le ZIP qui contient index.csv.](captures/export.png)
+<img src="captures/fiche.png" alt="Fiche BirdFile. Numéro de bague, code, nom français, nom latin, et vues à photographier." width="220">
+<img src="captures/code.png" alt="Recherche de code. Le code, le nom français et le nom latin, sans rien écrire sur la fiche." width="220">
+<img src="captures/export.png" alt="Export. Les fiches enregistrées, puis le ZIP qui contient index.csv." width="220">
 
 ## Installer
 
