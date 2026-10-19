@@ -34,7 +34,7 @@ Menu Chrome, Ajouter à l'écran d'accueil. L'icône s'appelle BirdFile. Chrome 
 
 Safari sur iPhone. Ouvre le même lien dans Safari, une seule fois, avec du réseau. Partage, puis Sur l'écran d'accueil. L'icône s'appelle BirdFile. Ensuite elle marche sans réseau.
 
-Chrome sur iPhone n'ouvre pas l'appareil photo : ImageCapture y manque. Le son, lui, s'enregistre. Safari et Chrome sont deux sites : les fiches de l'un ne sont pas dans l'autre.
+Chrome sur iPhone prend aussi la photo et le son. ImageCapture y manque, donc le déclencheur ouvre l'appareil photo du téléphone. Safari, lui, prend la photo dans la page. Safari et Chrome sont deux sites : les fiches de l'un ne sont pas dans l'autre.
 
 La page du lien, `localhost` et `127.0.0.1` sont trois sites distincts. Les photos de l'un ne sont pas dans les autres.
 
@@ -62,6 +62,8 @@ La photo se prend à l'horizontale. Le cadre 4:3 occupe toute la hauteur. Le dé
 
 Le cliché gardé est le plus grand 4:3 proposé par l'appareil. L'écran montre un aperçu ramené à la taille de l'écran. Le JPEG n'est pas recompressé. La largeur s'écrit avant Garder, et dans `index.csv`. Sous 2400 px, la page le signale.
 
+Sans ImageCapture, le déclencheur ouvre l'appareil photo du téléphone. Le JPEG déjà produit par cet appareil est gardé tel quel. Le format doit être 4:3, à l'horizontale. Le zoom n'est pas indiqué : la page écrit `non lu`. Si le fichier n'est pas un JPEG, la page le convertit et l'écran le dit.
+
 Ajouter audio démarre le son. Si l'espèce demande un cri au relâché, le bouton le dit. Un son déjà gardé propose Refaire l'audio.
 
 Choisir une espèce n'écrit pas la fiche. Elle est écrite en gardant une photo, ou en arrêtant un audio.
@@ -71,6 +73,8 @@ Choisir une espèce n'écrit pas la fiche. Elle est écrite en gardant une photo
 ## Export
 
 Télécharger le ZIP. Le fichier s'appelle `birdfile_` suivi de la date et de l'heure. Un dossier par bague, les JPEG, le son, et `index.csv`.
+
+Le navigateur ne demande pas de dossier. Le ZIP va dans le dossier de téléchargement déjà réglé, et la page l'écrit sous le bouton. Sur Android, c'est souvent Téléchargements, dans l'appli Fichiers. Sur iPhone avec Safari, l'endroit est dans Réglages, Safari, Téléchargements, souvent Fichiers, Sur mon iPhone, Téléchargements. Chrome sur iPhone le range dans ses téléchargements : Chrome, puis Téléchargements.
 
 Colonnes, séparées par des points-virgules :
 
@@ -96,4 +100,4 @@ node logic.test.mjs
 
 ## Limite
 
-Visé pour Chrome sur Android et pour Safari sur iPhone. Chrome sur iPhone n'ouvre pas la photo. La page ne remplace pas la fiche papier et n'enregistre pas le lieu.
+Visé pour Chrome sur Android et pour iPhone, dans Safari comme dans Chrome. La page ne remplace pas la fiche papier et n'enregistre pas le lieu.

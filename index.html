@@ -28,7 +28,7 @@
   <link rel="icon" href="./icon-192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="sitemap" type="application/xml" title="Sitemap" href="https://kevin-guille.github.io/birdfile/sitemap.xml">
-  <link rel="stylesheet" href="./app.css?v=19">
+  <link rel="stylesheet" href="./app.css?v=20">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -38,7 +38,7 @@
     "image": "https://kevin-guille.github.io/birdfile/icon-512.png",
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Android, iOS",
-    "browserRequirements": "Chrome sur Android, Safari sur iPhone",
+    "browserRequirements": "Chrome sur Android, Safari et Chrome sur iPhone",
     "inLanguage": "fr",
     "isAccessibleForFree": true,
     "offers": {
@@ -112,6 +112,7 @@
     <section id="tab-export" hidden>
       <p id="bilan"></p>
       <button type="button" id="zip" class="primaire">Télécharger le ZIP</button>
+      <p id="zip-lieu" hidden></p>
       <div id="liste"></div>
       <button type="button" id="effacer">Tout effacer</button>
     </section>
@@ -121,6 +122,7 @@
     <button type="button" data-tab="code">Code</button>
     <button type="button" data-tab="export">Export</button>
   </nav>
+  <input id="photo-fichier" type="file" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true">
   <section id="cam" hidden>
     <div class="cam-top">
       <button type="button" id="cam-fermer">Fermer</button>
@@ -129,6 +131,7 @@
     </div>
     <div class="stage">
       <video id="video" playsinline autoplay muted></video>
+      <p id="cam-fichier" hidden>Format 4:3, téléphone à l'horizontale. Le déclencheur ouvre l'appareil photo. Le zoom n'est pas lu.</p>
       <div class="cadre"></div>
     </div>
     <p id="cam-hint"></p>

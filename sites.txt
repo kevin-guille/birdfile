@@ -4,7 +4,7 @@ langue: fr
 auteur: Kevin Guille
 code: https://github.com/kevin-guille/birdfile
 
-BirdFile est un outil gratuit de terrain. Il tourne dans Chrome sur Android et dans Safari sur iPhone, et il continue hors ligne. Chrome sur iPhone n'ouvre pas l'appareil photo. Les fiches restent sur l'appareil.
+BirdFile est un outil gratuit de terrain. Il tourne dans Chrome sur Android et sur iPhone, dans Safari comme dans Chrome, et il continue hors ligne. Sur iPhone, Chrome ouvre l'appareil photo du téléphone quand ImageCapture manque. Les fiches restent sur l'appareil.
 
 Deux usages.
 

@@ -2,7 +2,7 @@
 
 Dépôt public : birdfile. Le dossier local reste `bagues`. Le titre à l'écran est BirdFile. L'icône est l'oiseau sur fond vert, `icon-192.png` et `icon-512.png`. La base IndexedDB reste `bagues`. La description publique est dans `index.html`, `manifest.webmanifest`, `README.md`, `llms.txt`, `sites.txt`, `robots.txt` et `sitemap.xml`.
 
-La page publique est https://kevin-guille.github.io/birdfile/ . Le README la montre en premier. Sur Android, l'installation passe par le menu Chrome, Ajouter à l'écran d'accueil. Sur iPhone, elle passe par Safari, Partage, puis Sur l'écran d'accueil. Chrome sur iPhone n'ouvre pas la photo.
+La page publique est https://kevin-guille.github.io/birdfile/ . Le README la montre en premier. Sur Android, l'installation passe par le menu Chrome, Ajouter à l'écran d'accueil. Sur iPhone, elle passe par Safari, Partage, puis Sur l'écran d'accueil. Safari et Chrome sur iPhone restent deux sites.
 
 Les commits locaux sont signés Kevin Guille. Le push se fait depuis le compte kevin-guille, dans le terminal : `git push`, puis le jeton `ghp_` quand le terminal demande `Password for 'https://kevin-guille@github.com'`. Le `.git/config` de ce dépôt laisse les assistants d'identifiants vides pour github.com et fixe le nom `kevin-guille`. Ne pas remettre d'assistant graphique, ni `gh`, ni le compte InvNat. Ne pas modifier le git config global.
 
@@ -18,11 +18,11 @@ Fiche : l'espèce est facultative. L'onglet Code ne sélectionne rien. Choisir u
 
 Libellés : Ajouter photos (seulement sans série de vues), Ajouter audio, Cri au relâché si le protocole le demande, Refaire l'audio si un son est déjà gardé. Pas de nom anglais. Le latin vient du champ `s`.
 
-Photo : paysage, cadre 4:3 sur toute la hauteur, déclencheur à droite. Le fichier est le plus grand 4:3 proposé, zoom 1, JPEG d'origine. L'écran montre l'aperçu. Alerte sous 2400 px de large. Sept vues nommées, une photo chacune. Pas de pile Autres. Safari sur iPhone a ImageCapture et la photo fonctionne. Chrome sur iPhone ne l'a pas : la photo ne s'ouvre pas, le son oui.
+Photo : paysage, cadre 4:3 sur toute la hauteur, déclencheur à droite. Le fichier est le plus grand 4:3 proposé, zoom 1, JPEG d'origine. L'écran montre l'aperçu. Alerte sous 2400 px de large. Sept vues nommées, une photo chacune. Pas de pile Autres. Safari sur iPhone a ImageCapture : la photo se prend dans la page. Chrome sur iPhone ne l'a pas : le déclencheur ouvre l'appareil photo du téléphone, le JPEG d'origine est gardé s'il est déjà en JPEG, le zoom s'écrit `non lu`. Un fichier qui n'est pas un JPEG est converti, et l'écran le dit. Si la prise directe échoue, ou si la caméra de la page est refusée, le même repli s'ouvre. Le zoom hors de 1 refuse toujours la prise directe.
 
 Mémoire : IndexedDB `bagues` / `oiseaux` et le localStorage survivent à l'extinction, pour l'origine exacte. Rien n'est écrit avant Garder ou Stop. `storage.persist()` est demandé. Retirer l'icône n'efface pas. Tout effacer, Effacer cette bague, ou vider les données du site efface.
 
-Export : le ZIP s'appelle `birdfile_` suivi de la date et de l'heure. `index.csv` a les colonnes `bague;code;nom;latin;controle;vue;fichier;largeur;hauteur;zoom;prise;duree_s`. Un code vide efface nom et latin. Un zoom absent s'écrit `non lu`. Le ZIP réétiquette les fichiers avec l'espèce courante. La fiche garde `bague`, `code`, `nom`, `latin`, `controle`, `vues` (blob, w, h, zoom, ts) et `cri` (blob, mime, duree, ts).
+Export : le ZIP s'appelle `birdfile_` suivi de la date et de l'heure. `index.csv` a les colonnes `bague;code;nom;latin;controle;vue;fichier;largeur;hauteur;zoom;prise;duree_s`. Un code vide efface nom et latin. Un zoom absent s'écrit `non lu`. Le ZIP réétiquette les fichiers avec l'espèce courante. La fiche garde `bague`, `code`, `nom`, `latin`, `controle`, `vues` (blob, w, h, zoom, ts) et `cri` (blob, mime, duree, ts). Le navigateur ne demande pas de dossier : après le téléchargement, la page écrit sous le bouton le dossier déjà réglé. Android : souvent Téléchargements. Safari sur iPhone : Réglages, Safari, Téléchargements, souvent Fichiers, Sur mon iPhone, Téléchargements. Chrome sur iPhone : les téléchargements de Chrome.
 
 Tout effacer : deux écrans rouges calés sur la zone visible, sous la barre d'adresse. Le bouton passe du haut gauche au bas droit. Annuler reste en bas.
 

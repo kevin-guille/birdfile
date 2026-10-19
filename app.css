@@ -58,6 +58,26 @@ header strong img {
   font-size: 15px;
 }
 
+#zip-lieu {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border: 2px solid var(--vert);
+  border-radius: 8px;
+  background: var(--feuille);
+  font-size: 16px;
+}
+
+#zip-lieu[hidden] { display: none !important; }
+
+#photo-fichier {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
 main {
   width: 100%;
   max-width: 100%;
@@ -403,6 +423,28 @@ video, #apercu img {
   inset: 0;
   border: 2px solid rgba(255, 255, 255, 0.9);
   pointer-events: none;
+}
+
+#cam.fichier video { visibility: hidden; }
+
+#cam-fichier {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  margin: 0;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+#cam-fichier[hidden] { display: none !important; }
+
+@media (orientation: portrait) {
+  #cam.fichier #cam-fichier { display: none !important; }
 }
 
 #cam-hint:empty { display: none !important; }

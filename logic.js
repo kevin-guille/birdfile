@@ -819,3 +819,26 @@ export function photoAcceptable(width, height) {
   if (width < 1000) return { ok: false, raison: "Photo trop petite. Réessaie." };
   return { ok: true, raison: width < 2400 ? "Largeur sous 2400 px. Vérifie à la maison que ce n'est pas la vidéo." : "" };
 }
+
+export function lieuZip(nom, contexte = {}) {
+  const fichier = nom || "Le ZIP";
+  const ios = !!contexte.ios;
+  const android = !!contexte.android;
+  const navigateur = contexte.navigateur || "autre";
+  const appareil = contexte.tablette ? "iPad" : "iPhone";
+  let texte;
+  if (ios && navigateur === "chrome") {
+    texte = `${fichier} est dans les téléchargements de Chrome. Chrome ne demande pas de dossier. Ouvre Chrome, puis Téléchargements, et touche le fichier.`;
+  } else if (ios && navigateur === "safari") {
+    texte = `${fichier} est dans le dossier de téléchargement de Safari. Safari ne demande pas de dossier : l'endroit est dans Réglages, Safari, Téléchargements. Souvent, c'est l'appli Fichiers, Sur mon ${appareil}, Téléchargements.`;
+    if (contexte.installe) texte += " L'icône utilise le même dossier que Safari.";
+  } else if (ios) {
+    texte = `${fichier} est dans le dossier de téléchargement du navigateur. Il ne demande pas d'emplacement : c'est celui réglé dans le navigateur. Regarde aussi l'appli Fichiers, Téléchargements.`;
+  } else if (android) {
+    texte = `${fichier} est dans Téléchargements. Le navigateur ne demande pas de dossier : il utilise celui de ses paramètres. L'appli Fichiers l'ouvre sous Téléchargements.`;
+    if (contexte.installe) texte += " L'icône utilise le même dossier.";
+  } else {
+    texte = `${fichier} est dans le dossier de téléchargement du navigateur. Il ne demande pas d'emplacement : c'est le dossier réglé dans le navigateur.`;
+  }
+  return texte;
+}

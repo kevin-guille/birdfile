@@ -10,6 +10,7 @@ import {
   etiquette,
   extensionCri,
   incrementBague,
+  lieuZip,
   indexEspeces,
   ligneArchive,
   marqueVue,
@@ -45,6 +46,7 @@ const state = {
   attente: null,
   vueEnCours: "",
   apercuUrl: "",
+  choixPhoto: false,
 };
 
 const BAGUE_KEY = "bagues-bague";
@@ -504,6 +506,12 @@ function majOrientation() {
   $("declencheur").disabled = !horizontal || !state.cam;
 }
 
+function peutPhotoDirecte() {
+  return window.isSecureContext
+    && typeof ImageCapture === "function"
+    && !!navigator.mediaDevices?.getUserMedia;
+}
+
 async function verrouillerZoom(track) {
   const caps = track.getCapabilities ? track.getCapabilities() : {};
   if (!caps.zoom) return { zoom: null, ok: true };
@@ -517,6 +525,42 @@ async function verrouillerZoom(track) {
   return { zoom, ok: Math.abs(zoom - 1) < 0.02 };
 }
 
+function preparerEcranPhoto(vueId) {
+  state.vueEnCours = vueId;
+  $("cam-titre").textContent = `${state.bague}  ${VUES[vueId].label}`;
+  $("cam-hint").textContent = "";
+  $("cam").hidden = false;
+  $("cam").classList.remove("fichier");
+  $("cam-fichier").hidden = true;
+  $("apercu").hidden = true;
+  $("declencheur").hidden = false;
+  document.querySelector("nav").hidden = true;
+}
+
+function activerModeFichier(message) {
+  if (state.cam?.stream) {
+    state.cam.stream.getTracks().forEach((track) => track.stop());
+  }
+  $("video").srcObject = null;
+  state.cam = { mode: "fichier" };
+  $("cam").classList.add("fichier");
+  $("cam-fichier").hidden = false;
+  $("cam-zoom").textContent = "zoom non lu";
+  if (message) {
+    $("cam-hint").textContent = message;
+    dire(message);
+  }
+  majOrientation();
+}
+
+function ouvrirFichierPhoto() {
+  const input = $("photo-fichier");
+  input.value = "";
+  state.choixPhoto = true;
+  // Le click doit rester dans le geste, sinon iPhone ignore l'ouverture.
+  input.click();
+}
+
 async function ouvrirCamera(vueId) {
   const saisi = cleanBague($("bague").value);
   if (saisi && saisi !== state.bague) chargerBague(saisi);
@@ -524,23 +568,20 @@ async function ouvrirCamera(vueId) {
     dire("Écris d'abord le numéro de bague.");
     return;
   }
-  if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
-    dire("Caméra indisponible. Ouvre l'app depuis http://127.0.0.1:8080");
-    return;
-  }
-  if (typeof ImageCapture === "undefined") {
-    dire("Ce Chrome n'a pas ImageCapture. Mets-le à jour avant le départ.");
-    return;
-  }
   await fermerCamera();
-  state.vueEnCours = vueId;
-  const vue = VUES[vueId];
-  $("cam-titre").textContent = `${state.bague}  ${vue.label}`;
-  $("cam-hint").textContent = "";
-  $("cam").hidden = false;
-  $("apercu").hidden = true;
-  $("declencheur").hidden = false;
-  document.querySelector("nav").hidden = true;
+  preparerEcranPhoto(vueId);
+  if (!peutPhotoDirecte()) {
+    activerModeFichier();
+    return;
+  }
+  try {
+    await brancherFlux();
+  } catch {
+    activerModeFichier("Prise directe indisponible. Le déclencheur ouvre l'appareil photo du téléphone.");
+  }
+}
+
+async function brancherFlux() {
   let stream;
   const videoBase = { facingMode: { exact: "environment" }, aspectRatio: { exact: 4 / 3 } };
   try {
@@ -552,24 +593,31 @@ async function ouvrirCamera(vueId) {
         video: { facingMode: { ideal: "environment" }, aspectRatio: { ideal: 4 / 3 } },
       });
     } catch {
-      dire("Caméra refusée. Autorise l'appareil photo pour ce site.");
-      $("cam").hidden = true;
-      document.querySelector("nav").hidden = false;
+      activerModeFichier("Caméra de la page refusée. Le déclencheur ouvre l'appareil photo du téléphone.");
       return;
     }
   }
   const track = stream.getVideoTracks()[0];
   const zoom = await verrouillerZoom(track);
-  $("cam-zoom").textContent = zoom.zoom == null ? "zoom non lu" : `zoom ${zoom.zoom}`;
   if (!zoom.ok) {
     stream.getTracks().forEach((item) => item.stop());
     dire("Le zoom n'est pas à 1. Photo refusée.");
-    $("cam").hidden = true;
-    document.querySelector("nav").hidden = false;
+    await fermerCamera();
+    return;
+  }
+  let ic;
+  try {
+    ic = new ImageCapture(track);
+  } catch {
+    stream.getTracks().forEach((item) => item.stop());
+    activerModeFichier("Prise directe indisponible. Le déclencheur ouvre l'appareil photo du téléphone.");
     return;
   }
   $("video").srcObject = stream;
-  state.cam = { stream, track, ic: new ImageCapture(track), zoom: zoom.zoom };
+  $("cam-zoom").textContent = zoom.zoom == null ? "zoom non lu" : `zoom ${zoom.zoom}`;
+  state.cam = { stream, track, ic, zoom: zoom.zoom };
+  $("cam").classList.remove("fichier");
+  $("cam-fichier").hidden = true;
   majOrientation();
 }
 
@@ -577,18 +625,135 @@ async function fermerCamera() {
   if (state.apercuUrl) URL.revokeObjectURL(state.apercuUrl);
   state.apercuUrl = "";
   state.attente = null;
-  if (state.cam) {
+  state.choixPhoto = false;
+  if (state.cam?.stream) {
     state.cam.stream.getTracks().forEach((track) => track.stop());
-    state.cam = null;
   }
+  state.cam = null;
   $("video").srcObject = null;
   $("cam").hidden = true;
+  $("cam").classList.remove("fichier");
+  $("cam-fichier").hidden = true;
   $("apercu").hidden = true;
   document.querySelector("nav").hidden = false;
 }
 
+function messageRefusPhoto(raison) {
+  if (state.cam?.mode === "fichier" && String(raison).startsWith("Pas au format")) {
+    return `${raison} Dans l'appareil photo, choisis 4:3.`;
+  }
+  return raison;
+}
+
+async function presenterPhoto(blob, zoom, note) {
+  const bitmap = await createImageBitmap(blob);
+  const width = bitmap.width;
+  const height = bitmap.height;
+  bitmap.close();
+  const verdict = photoAcceptable(width, height);
+  if (!verdict.ok) {
+    const raison = messageRefusPhoto(verdict.raison);
+    $("cam-hint").textContent = raison;
+    dire(raison);
+    return;
+  }
+  const tagged = tagJpeg(
+    new Uint8Array(await blob.arrayBuffer()),
+    etiquette(state.bague, state.code, marqueVue(state.vueEnCours)),
+  );
+  const finalBlob = new Blob([tagged], { type: "image/jpeg" });
+  state.attente = {
+    vue: state.vueEnCours,
+    blob: finalBlob,
+    w: width,
+    h: height,
+    zoom,
+    ts: new Date().toISOString(),
+  };
+  if (state.apercuUrl) URL.revokeObjectURL(state.apercuUrl);
+  state.apercuUrl = URL.createObjectURL(finalBlob);
+  $("apercu-img").src = state.apercuUrl;
+  const mesure = zoom == null ? `${width} x ${height}, zoom non lu` : `${width} x ${height}, zoom ${zoom}`;
+  const suite = [note, verdict.raison].filter(Boolean).join(" ");
+  $("apercu-info").textContent = suite ? `${mesure}. ${suite}` : mesure;
+  $("apercu").hidden = false;
+  $("declencheur").hidden = true;
+  if (suite) dire(suite);
+}
+
+async function bitmapDepuis(bytes, type) {
+  const blob = new Blob([bytes], { type: type || "" });
+  try {
+    return await createImageBitmap(blob);
+  } catch {
+    const url = URL.createObjectURL(blob);
+    try {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      return await createImageBitmap(img);
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+}
+
+async function convertirEnJpeg(bytes, type) {
+  let bitmap;
+  try {
+    bitmap = await bitmapDepuis(bytes, type);
+  } catch {
+    throw new Error("Photo illisible. Dans Réglages, Appareil photo, Formats, choisis Le plus compatible.");
+  }
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!ctx) throw new Error("conversion");
+    ctx.drawImage(bitmap, 0, 0);
+    const jpeg = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.92));
+    if (!jpeg) throw new Error("conversion");
+    return jpeg;
+  } catch (error) {
+    if (error?.message && error.message !== "conversion") throw error;
+    throw new Error("Cette photo n'a pas pu être gardée en JPEG. Dans Réglages, Appareil photo, Formats, choisis Le plus compatible, puis refais-la.");
+  } finally {
+    bitmap.close();
+  }
+}
+
+async function recevoirPhoto(file) {
+  if (!state.vueEnCours || !state.bague || state.cam?.mode !== "fichier") return;
+  $("declencheur").disabled = true;
+  $("cam-hint").textContent = "Lecture de la photo.";
+  try {
+    const brut = new Uint8Array(await file.arrayBuffer());
+    let blob;
+    let note = "";
+    if (brut.length >= 2 && brut[0] === 0xff && brut[1] === 0xd8) {
+      blob = new Blob([brut], { type: "image/jpeg" });
+    } else {
+      blob = await convertirEnJpeg(brut, file.type);
+      note = "Converti en JPEG.";
+    }
+    await presenterPhoto(blob, null, note);
+  } catch (error) {
+    const raison = error?.message || "La photo a échoué.";
+    $("cam-hint").textContent = raison;
+    dire(raison);
+  } finally {
+    $("photo-fichier").value = "";
+    majOrientation();
+  }
+}
+
 async function declencher() {
   if (!state.cam || !paysage()) return;
+  if (state.cam.mode === "fichier") {
+    ouvrirFichierPhoto();
+    return;
+  }
   $("declencheur").disabled = true;
   try {
     const zoom = await verrouillerZoom(state.cam.track);
@@ -599,42 +764,23 @@ async function declencher() {
       dire(raison);
       return;
     }
-    const caps = await state.cam.ic.getPhotoCapabilities();
-    const options = target43(caps) || {};
-    if (Array.isArray(caps.fillLightMode) && caps.fillLightMode.includes("off")) {
-      options.fillLightMode = "off";
+    let blob;
+    try {
+      const caps = await state.cam.ic.getPhotoCapabilities();
+      const options = target43(caps) || {};
+      if (Array.isArray(caps.fillLightMode) && caps.fillLightMode.includes("off")) {
+        options.fillLightMode = "off";
+      }
+      blob = await state.cam.ic.takePhoto(options);
+    } catch {
+      try {
+        blob = await state.cam.ic.takePhoto();
+      } catch {
+        activerModeFichier("La prise directe a échoué. Nouveau déclenchement : l'appareil photo du téléphone s'ouvre.");
+        return;
+      }
     }
-    const blob = await state.cam.ic.takePhoto(options);
-    const bitmap = await createImageBitmap(blob);
-    const width = bitmap.width;
-    const height = bitmap.height;
-    bitmap.close();
-    const verdict = photoAcceptable(width, height);
-    if (!verdict.ok) {
-      $("cam-hint").textContent = verdict.raison;
-      dire(verdict.raison);
-      return;
-    }
-    const tagged = tagJpeg(
-      new Uint8Array(await blob.arrayBuffer()),
-      etiquette(state.bague, state.code, marqueVue(state.vueEnCours)),
-    );
-    const finalBlob = new Blob([tagged], { type: "image/jpeg" });
-    state.attente = {
-      vue: state.vueEnCours,
-      blob: finalBlob,
-      w: width,
-      h: height,
-      zoom: zoom.zoom,
-      ts: new Date().toISOString(),
-    };
-    if (state.apercuUrl) URL.revokeObjectURL(state.apercuUrl);
-    state.apercuUrl = URL.createObjectURL(finalBlob);
-    $("apercu-img").src = state.apercuUrl;
-    $("apercu-info").textContent = `${width} x ${height}${zoom.zoom == null ? "" : `, zoom ${zoom.zoom}`}${verdict.raison ? `. ${verdict.raison}` : ""}`;
-    $("apercu").hidden = false;
-    $("declencheur").hidden = true;
-    if (verdict.raison) dire(verdict.raison);
+    await presenterPhoto(blob, zoom.zoom, "");
   } catch (error) {
     const raison = error?.message || "La photo a échoué.";
     $("cam-hint").textContent = raison;
@@ -725,7 +871,26 @@ async function exporter() {
   lien.download = `birdfile_${horodatage}.zip`;
   lien.click();
   setTimeout(() => URL.revokeObjectURL(lien.href), 4000);
-  dire("ZIP téléchargé. Copie-le hors du téléphone ce soir.");
+  const phrase = lieuZip(lien.download, contexteExport());
+  $("zip-lieu").hidden = false;
+  $("zip-lieu").textContent = phrase;
+  dire(`${lien.download} enregistré. L'endroit est écrit sous le bouton, dans Export.`);
+}
+
+function contexteExport() {
+  const ua = navigator.userAgent || "";
+  const tablette = /iPad/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const ios = tablette || /iPhone|iPod/.test(ua);
+  const android = /Android/i.test(ua);
+  let navigateur = "autre";
+  if (/CriOS/i.test(ua)) navigateur = "chrome";
+  else if (/FxiOS|Firefox/i.test(ua)) navigateur = "firefox";
+  else if (/EdgiOS|Edg\//i.test(ua)) navigateur = "edge";
+  else if (/Chrome\//i.test(ua)) navigateur = "chrome";
+  else if (/Safari/i.test(ua)) navigateur = "safari";
+  const installe = window.navigator.standalone === true
+    || window.matchMedia("(display-mode: standalone)").matches;
+  return { ios, android, navigateur, tablette, installe };
 }
 
 function brancher() {
@@ -818,13 +983,34 @@ function brancher() {
     $("declencheur").hidden = false;
     $("cam-hint").textContent = "";
     majOrientation();
+    if (state.cam?.mode === "fichier" && paysage()) ouvrirFichierPhoto();
+  });
+  $("photo-fichier").addEventListener("change", () => {
+    state.choixPhoto = false;
+    const file = $("photo-fichier").files?.[0];
+    if (!file || state.cam?.mode !== "fichier") {
+      $("photo-fichier").value = "";
+      return;
+    }
+    recevoirPhoto(file);
+  });
+  $("photo-fichier").addEventListener("cancel", () => {
+    state.choixPhoto = false;
   });
   $("garder").addEventListener("click", garder);
   window.addEventListener("resize", () => {
     if (!state.cam) return;
     majOrientation();
   });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible" || !state.choixPhoto) return;
+    setTimeout(() => {
+      if (state.choixPhoto && !$("photo-fichier").files?.length) state.choixPhoto = false;
+    }, 1500);
+  });
   window.addEventListener("pagehide", () => {
+    // L'appareil photo du téléphone masque la page. pagehide ne doit pas jeter la vue en cours.
+    if (state.choixPhoto) return;
     fermerCamera();
     if (state.criEtat === "recording") arreterCri();
   });

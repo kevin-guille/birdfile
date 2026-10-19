@@ -17,6 +17,7 @@ import {
   ligneArchive,
   indexEspeces,
   lireEtiquetteAudio,
+  lieuZip,
   lireEtiquetteJpeg,
   marqueVue,
   photoAcceptable,
@@ -191,9 +192,33 @@ assert.deepEqual(target43({
 }), { imageWidth: 4000, imageHeight: 3000 });
 
 assert.equal(photoAcceptable(4000, 3000).ok, true);
+assert.equal(photoAcceptable(4032, 3024).ok, true);
 assert.equal(photoAcceptable(3000, 4000).ok, false);
+assert.equal(photoAcceptable(4032, 2268).ok, false);
 assert.equal(photoAcceptable(1920, 1080).ok, false);
 assert.equal(photoAcceptable(1920, 1440).raison.includes("2400"), true);
+
+const phrasesZip = [
+  lieuZip("birdfile_20261019_1530.zip", { ios: true, navigateur: "chrome" }),
+  lieuZip("birdfile_20261019_1530.zip", { ios: true, navigateur: "safari" }),
+  lieuZip("birdfile_20261019_1530.zip", { ios: true, navigateur: "safari", tablette: true, installe: true }),
+  lieuZip("birdfile_20261019_1530.zip", { ios: true, navigateur: "firefox" }),
+  lieuZip("birdfile_20261019_1530.zip", { android: true, installe: true }),
+  lieuZip("birdfile_20261019_1530.zip", {}),
+];
+assert.match(phrasesZip[0], /téléchargements de Chrome/);
+assert.match(phrasesZip[0], /ne demande pas de dossier/);
+assert.match(phrasesZip[1], /Sur mon iPhone/);
+assert.match(phrasesZip[1], /Réglages, Safari, Téléchargements/);
+assert.match(phrasesZip[2], /Sur mon iPad/);
+assert.match(phrasesZip[2], /même dossier que Safari/);
+assert.match(phrasesZip[3], /Fichiers, Téléchargements/);
+assert.match(phrasesZip[4], /L'icône utilise le même dossier/);
+assert.match(phrasesZip[5], /dossier réglé dans le navigateur/);
+for (const texte of phrasesZip) {
+  assert.equal(texte.startsWith("birdfile_20261019_1530.zip"), true);
+  assert.equal(/[—–]|--/.test(texte), false);
+}
 
 function lireZip(zip) {
   const fichiers = [];

@@ -1,4 +1,4 @@
-const VERSION = "birdfile-19";
+const VERSION = "birdfile-20";
 const FICHIERS = [
   "./index.html",
   "./app.js",
