@@ -2,7 +2,7 @@
 
 > BirdFile cherche un code oiseau et affiche le nom français et le nom latin. BirdFile tient aussi la fiche d'un oiseau en main : photos des détails et cri, liés au numéro de bague. Chaque photo et chaque son est un fichier repris dans index.csv.
 
-BirdFile est un outil gratuit, en français, qui tourne dans Chrome et reste sur le téléphone, y compris hors ligne. Il ne remplace pas la fiche papier et n'enregistre pas le lieu.
+BirdFile est un outil gratuit, en français, qui tourne dans Chrome sur Android et dans Safari sur iPhone. Il reste sur le téléphone, y compris hors ligne. Chrome sur iPhone n'ouvre pas l'appareil photo. Il ne remplace pas la fiche papier et n'enregistre pas le lieu.
 
 La recherche porte sur la liste monde des codes de baguage. On saisit un code, un nom français ou un nom latin. La page répond par le code, le nom français et le nom latin.
 

@@ -32,6 +32,10 @@ Chrome sur Android. Ouvre le lien ci-dessus, une seule fois, avec du réseau.
 
 Menu Chrome, Ajouter à l'écran d'accueil. L'icône s'appelle BirdFile. Chrome range ce geste dans son menu. Ensuite l'icône marche sans réseau, y compris en mode avion.
 
+Safari sur iPhone. Ouvre le même lien dans Safari, une seule fois, avec du réseau. Partage, puis Sur l'écran d'accueil. L'icône s'appelle BirdFile. Ensuite elle marche sans réseau.
+
+Chrome sur iPhone n'ouvre pas l'appareil photo : ImageCapture y manque. Le son, lui, s'enregistre. Safari et Chrome sont deux sites : les fiches de l'un ne sont pas dans l'autre.
+
 La page du lien, `localhost` et `127.0.0.1` sont trois sites distincts. Les photos de l'un ne sont pas dans les autres.
 
 Pour un essai au câble sur son propre téléphone, débogage USB :
@@ -56,13 +60,13 @@ Sans espèce, les sept vues sont là : tête, dessus, croupion, aile droite, que
 
 La photo se prend à l'horizontale. Le cadre 4:3 occupe toute la hauteur. Le déclencheur est à droite. Le zoom doit être à 1.
 
-Le cliché gardé est le plus grand 4:3 proposé par l'appareil. Chrome montre un aperçu ramené à l'écran. Le JPEG n'est pas recompressé. La largeur s'écrit avant Garder, et dans `index.csv`. Sous 2400 px, la page le signale.
+Le cliché gardé est le plus grand 4:3 proposé par l'appareil. L'écran montre un aperçu ramené à la taille de l'écran. Le JPEG n'est pas recompressé. La largeur s'écrit avant Garder, et dans `index.csv`. Sous 2400 px, la page le signale.
 
 Ajouter audio démarre le son. Si l'espèce demande un cri au relâché, le bouton le dit. Un son déjà gardé propose Refaire l'audio.
 
 Choisir une espèce n'écrit pas la fiche. Elle est écrite en gardant une photo, ou en arrêtant un audio.
 
-Éteindre le téléphone laisse les fiches en place. Une photo est écrite à Garder, un son à Stop. Sans ZIP, elles restent dans Chrome pour cette adresse. Tout effacer, Effacer cette bague, ou vider les données du site les enlève. Retirer l'icône ne les enlève pas.
+Éteindre le téléphone laisse les fiches en place. Une photo est écrite à Garder, un son à Stop. Sans ZIP, elles restent dans le navigateur pour cette adresse. Tout effacer, Effacer cette bague, ou vider les données du site les enlève. Retirer l'icône ne les enlève pas.
 
 ## Export
 
@@ -78,7 +82,7 @@ Le commentaire JPEG contient la bague, le code et la vue. L'aile droite est écr
 
 Tout effacer ouvre deux écrans rouges, calés sur la zone visible. Le premier bouton, Effacer, est en haut à gauche. Le second, Effacer définitivement, est en bas à droite. Annuler, en bas, laisse les fiches. Un ZIP déjà dans Téléchargements n'est pas touché.
 
-Les photos et les sons sont dans la mémoire Chrome de cette adresse, pas dans la galerie.
+Les photos et les sons sont dans la mémoire du navigateur pour cette adresse, pas dans la galerie.
 
 ## Liste d'espèces
 
@@ -92,4 +96,4 @@ node logic.test.mjs
 
 ## Limite
 
-Visé pour Chrome sur Android. Pas essayé sur iPhone. La page ne remplace pas la fiche papier et n'enregistre pas le lieu.
+Visé pour Chrome sur Android et pour Safari sur iPhone. Chrome sur iPhone n'ouvre pas la photo. La page ne remplace pas la fiche papier et n'enregistre pas le lieu.
